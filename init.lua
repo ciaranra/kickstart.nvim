@@ -622,7 +622,26 @@ require('lazy').setup({
         clangd = {},
         -- gopls = {},
         -- For Python setup see: https://www.playfulpython.com/configuring-neovim-as-a-python-ide/
-        pyright = {}, -- need to install node and npm. e.g., sudo apt install nodejs npm
+        pyright = {
+          before_init = function(_, config)
+            local venv = vim.fn.finddir('.venv', vim.fn.getcwd() .. ';')
+            -- Try python3 first, fall back to python if needed
+            local python_path = venv .. '/bin/python3'
+            if vim.fn.executable(python_path) ~= 1 then
+              python_path = venv .. '/bin/python'
+            end
+            config.settings.python.pythonPath = python_path
+          end,
+          settings = {
+            python = {
+              analysis = {
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+                diagnosticMode = 'workspace',
+              },
+            },
+          },
+        }, -- need to install node and npm. e.g., sudo apt install nodejs npm
         rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
